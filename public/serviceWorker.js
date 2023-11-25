@@ -126,3 +126,33 @@ self.addEventListener('fetch', event => {
     )
   };
 });
+
+self.addEventListener('sync', event => {
+  console.log('[Service worker] Background syncing');
+  if (event.tag === 'sync-new-posts') {
+    event.waitUntil(
+      readAllData('sync-posts')
+        .then(data => {
+          for (var dt of data) {
+            fetch('https://pwagram-d032d-default-rtdb.firebaseio.com/posts.json', {
+              method: 'post',
+              headers: {
+                'content-type': 'application/json',
+                'accept': 'application/json',
+              },
+              body: JSON.stringify({
+                id: dt.id,
+                title: dt.title,
+                location: dt.location,
+              })
+            })
+              .then(res => {
+                if (res.ok) {
+                  deleteItemFromData('sync-posts', dt.id);
+                }
+              });
+          }
+        })
+    );
+  }
+});

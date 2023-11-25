@@ -2,6 +2,9 @@ var shareImageButton = document.querySelector('#share-image-button');
 var createPostArea = document.querySelector('#create-post');
 var closeCreatePostModalButton = document.querySelector('#close-create-post-modal-btn');
 var sharedMomentsArea = document.querySelector('#shared-moments');
+var form = document.querySelector('form');
+var titleInput = document.querySelector('#title');
+var locationInput = document.querySelector('#location');
 
 function openCreatePostModal() {
   createPostArea.style.transform = 'translateY(0vh)';
@@ -111,3 +114,56 @@ if ('indexedDB' in window) {
       }
     });
 }
+
+function sendData() {
+  fetch('https://pwagram-d032d-default-rtdb.firebaseio.com/posts.json', {
+    method: 'post',
+    headers: {
+      'content-type': 'application/json', 
+      'accept': 'application/json',
+    },
+    body: JSON.stringify({
+      id: new Date().toISOString(),
+      title: titleInput.value,
+      location: locationInput.value,
+    })
+  })
+    .then(() => {
+      updateUI();
+    });
+}
+
+form.addEventListener('submit', event => {
+  event.preventDefault();
+
+  if (titleInput.value.trim() === '' || locationInput.value.trim() === '') {
+    alert('Please enter valid data!');
+    return;
+  }
+
+  closeCreatePostModal();
+  if ('serviceWorker' in navigator && 'SyncManager' in window) {
+    navigator.serviceWorker.ready
+      .then(sw => {
+        var post = {
+          id: new Date().toISOString(),
+          title: titleInput.value,
+          location: locationInput.value,
+        };
+        writeData('sync-posts', post)
+          .then(() => {
+            return sw.sync.register('sync-new-posts');
+          })
+          .then(() => {
+            var snackbarContainer = document.querySelector('#confirmation-toast');
+            var data = { message: 'Your post was saved for syncing!' };
+            snackbarContainer.MaterialSnackbar.showSnackbar(data);
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      });
+  } else {
+    sendData();
+  }
+});
