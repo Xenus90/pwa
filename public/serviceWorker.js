@@ -156,3 +156,57 @@ self.addEventListener('sync', event => {
     );
   }
 });
+
+self.addEventListener('notificationclick', event => {
+  var notification = event.notification;
+  var action = event.action;
+  console.log(notification, action);
+  if (action === 'confirm') {
+    console.log('Confirm was chosen');
+    notification.close();
+  } else {
+    event.waitUntil(
+      clients.matchAll()
+        .then(clis => {
+          var client = clis.find(c => {
+            return c.visibilityState === 'visible';
+          });
+          if (client !== undefined) {
+            client.navigate(notification.data.url);
+            client.focus();
+          } else {
+            clients.openWindow(notification.data.url);
+          }
+          notification.close();
+        })
+    );
+    console.log(action);
+  }
+});
+
+self.addEventListener('notificationclose', event => {
+  console.log(event);
+});
+
+self.addEventListener('push', event => {
+  console.log('Push notification recieved');
+  var data = {
+    title: 'new',
+    content: 'something happened',
+    openUrl: '/',
+  };
+  if (event.data) {
+    data = JSON.parse(event.data.text());
+  }
+  var options = {
+    body: data.content,
+    icon: './src/images/icons/app-icon-96x96.png',
+    badge: './src/images/icons/app-icon-96x96.png',
+    data: {
+      url: data.openUrl,
+    },
+  };
+  event.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
+});
