@@ -7,11 +7,13 @@
   "license": "ISC",
   "scripts": {
     "start": "http-server -c-1",
-    "generate-sw": "workbox generate:sw",
-    "web-push": "web-push"
+    "generate-sw": "workbox inject:manifest",
+    "web-push": "web-push",
+    "minify": "uglifyjs public/src/js/app.js -o public/src/js/app.min.js --compress --mangle"
   },
   "devDependencies": {
     "http-server": "^14.1.1",
+    "uglify-js": "^3.17.4",
     "workbox-cli": "^2"
   },
   "dependencies": {
