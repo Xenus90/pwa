@@ -7,7 +7,7 @@ if (!window.Promise) {
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker
-    .register('./serviceWorker.js')
+    .register('./serviceWorkerWorkbox.js')
     .then(() => {
       console.log('Service worker registered!');
     })
