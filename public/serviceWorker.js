@@ -8,6 +8,7 @@ const STATIC_FILES = [
   './index.html',
   './offline.html',
   './src/js/app.js',
+  './src/js/utility.js',
   './src/js/feed.js',
   './src/js/idb.js',
   './src/js/promise.js',
@@ -134,17 +135,17 @@ self.addEventListener('sync', event => {
       readAllData('sync-posts')
         .then(data => {
           for (var dt of data) {
+            var postData = new FormData();
+            postData.append('id', dt.id);
+            postData.append('title', dt.title);
+            postData.append('location', dt.location);
+            postData.append('rawLocationLat', dt.rawLocation.lat);
+            postData.append('rawLocationLng', dt.rawLocation.lng);
+            postData.append('file', dt.picture, `${dt.id}.png`);
+
             fetch('https://pwagram-d032d-default-rtdb.firebaseio.com/posts.json', {
               method: 'post',
-              headers: {
-                'content-type': 'application/json',
-                'accept': 'application/json',
-              },
-              body: JSON.stringify({
-                id: dt.id,
-                title: dt.title,
-                location: dt.location,
-              })
+              body: postData,
             })
               .then(res => {
                 if (res.ok) {
