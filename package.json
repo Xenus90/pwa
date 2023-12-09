@@ -9,7 +9,8 @@
     "start": "http-server -c-1",
     "generate-sw": "workbox inject:manifest",
     "web-push": "web-push",
-    "minify": "uglifyjs public/src/js/app.js -o public/src/js/app.min.js --compress --mangle"
+    "minify": "uglifyjs public/src/js/app.js -o public/src/js/app.min.js --compress --mangle",
+    "build": "yarn minify && yarn generate-sw"
   },
   "devDependencies": {
     "http-server": "^14.1.1",
