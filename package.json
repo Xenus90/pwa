@@ -7,10 +7,12 @@
   "license": "ISC",
   "scripts": {
     "start": "http-server -c-1",
+    "generate-sw": "workbox generate:sw",
     "web-push": "web-push"
   },
   "devDependencies": {
-    "http-server": "^14.1.1"
+    "http-server": "^14.1.1",
+    "workbox-cli": "^2"
   },
   "dependencies": {
     "web-push": "^3.6.6"
